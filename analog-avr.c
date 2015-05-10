@@ -12,6 +12,8 @@
 static uint8_t adc_counter;
 static volatile uint16_t BSS adc_result[NUM_TEMP_SENSORS];
 
+static uint16_t useless;
+
 //! Configure all registers, start interrupt loop
 void analog_init() {
 
@@ -51,11 +53,14 @@ void analog_init() {
   } /* analog_mask */
 }
 
+#include "sersendf.h"
 /*! Analog Interrupt
 
 	This is where we read our analog value and store it in an array for later retrieval
 */
 ISR(ADC_vect, ISR_NOBLOCK) {
+
+useless++;
 	// emulate free-running mode but be more deterministic about exactly which result we have, since this project has long-running interrupts
   if (analog_mask) {
 		// store next result
@@ -90,6 +95,8 @@ ISR(ADC_vect, ISR_NOBLOCK) {
 */
 uint16_t analog_read(uint8_t index) {
   uint16_t result = 0;
+sersendf_P(PSTR("u %u\n"), useless);
+useless = 0;
 
   #ifdef AIO8_PIN
     if (index < sizeof(adc_channel) && adc_channel[index] < 16) {
