@@ -83,6 +83,8 @@ static void clock_250ms(void) {
 		}
 	}
 
+	temp_heater_tick();
+
 	ifclock(clock_flag_1s) {
 		if (DEBUG_POSITION && (debug_flags & DEBUG_POSITION)) {
 			// current position
