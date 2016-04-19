@@ -341,6 +341,7 @@ class Board:
     if self.settings.verbose >= 2:
       print values
 
+    source = "GUI" if values else self.configFile
     fp = file(path, 'w')
     self.configFile = path
 
@@ -448,7 +449,7 @@ class Board:
             fp.write("//")
           fp.write(defineValueFormat % (t[0], v[0]))
         else:
-          print "Value key " + t[0] + " not found in GUI."
+          print("Value key " + t[0] + " not found in " + source + ".")
 
         continue
 
@@ -466,7 +467,7 @@ class Board:
             # Known to be absent in the GUI, also won't be added anytime soon.
             fp.write(ln)
           else:
-            print "Boolean key " + t[0] + " not found in GUI."
+            print("Boolean key " + t[0] + " not found in " + source + ".")
 
         continue
 
