@@ -49,6 +49,11 @@
   #error REFERENCE undefined. See analog.h on how to choose it.
 #endif
 
+/** \def HAVE_ANALOG_TICK
+	Whether the board implements analog_tick(), i.e. analog reads on-demand
+	(as opposed to free-running ADC conversions).
+	Currently only implemented on AVR.
+*/
 #define HAVE_ANALOG_TICK
 
 #endif /* __AVR__ */
@@ -60,13 +65,7 @@ uint16_t	analog_read(uint8_t index);
 
 #ifdef HAVE_ANALOG_TICK
 
-#define DO_ANALOG_TICK()	do { analog_tick(); } while (0)
-
 void 			analog_tick(void);
-
-#else
-
-#define DO_ANALOG_TICK()
 
 #endif /* HAVE_ANALOG_TICK */
 
