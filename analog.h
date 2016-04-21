@@ -49,10 +49,26 @@
   #error REFERENCE undefined. See analog.h on how to choose it.
 #endif
 
+#define HAVE_ANALOG_TICK
+
 #endif /* __AVR__ */
 
 void 			analog_init(void);
 
 uint16_t	analog_read(uint8_t index);
+
+
+#ifdef HAVE_ANALOG_TICK
+
+#define DO_ANALOG_TICK()	do { analog_tick(); } while (0)
+
+void 			analog_tick(void);
+
+#else
+
+#define DO_ANALOG_TICK()
+
+#endif /* HAVE_ANALOG_TICK */
+
 
 #endif	/* _ANALOG_H */

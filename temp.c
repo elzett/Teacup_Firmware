@@ -110,15 +110,19 @@ void temp_init() {
       #endif
 
 		#ifdef	TEMP_THERMISTOR
-			// handled by analog_init()
-/*			case TT_THERMISTOR:
-				break;*/
+			// mostly handled by analog_init()
+			case TT_THERMISTOR:
+				// start a conversion so it's ready for the first temp_tick()
+				DO_ANALOG_TICK();
+				break;
 		#endif
 
 		#ifdef	TEMP_AD595
-			// handled by analog_init()
-/*			case TT_AD595:
-				break;*/
+			// mostly handled by analog_init()
+			case TT_AD595:
+				// start a conversion so it's ready for the first temp_tick()
+				DO_ANALOG_TICK();
+				break;
 		#endif
 
       #ifdef TEMP_INTERCOM
@@ -309,6 +313,8 @@ void temp_sensor_tick() {
             temp = temp_table_lookup(analog_read(i), i);
 
             temp_sensors_runtime[i].next_read_time = 0;
+						DO_ANALOG_TICK();
+
             break;
 				#endif	/* TEMP_THERMISTOR */
 
@@ -332,6 +338,7 @@ void temp_sensor_tick() {
 					temp = (temp * 500L) >> 8;
 
 					temp_sensors_runtime[i].next_read_time = 0;
+					DO_ANALOG_TICK();
 
 					break;
 				#endif	/* TEMP_AD595 */
