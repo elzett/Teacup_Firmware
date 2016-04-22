@@ -104,7 +104,7 @@ uint16_t next_analog_tick_time;
 /// Interval between analog_read() calls.
 /// 10ms if EWMA is enabled, because EWMA needs frequent updates,
 /// otherwise 250ms so that we don't waste time on unnecessary reads
-#define ANALOG_READ_INTERVAL	((TEMP_EWMA == 1.0) ? 25 : 0)
+#define ANALOG_READ_INTERVAL	((TEMP_EWMA == 1.0) ? 25 : 1)
 
 
 /// Set up temp sensors.
@@ -291,10 +291,7 @@ void temp_sensor_tick() {
 	temp_sensor_t i = 0;
 
 	for (; i < NUM_TEMP_SENSORS; i++) {
-		if (temp_sensors_runtime[i].next_read_time > 1) {
-			temp_sensors_runtime[i].next_read_time--;
-		}
-		else {
+		if (temp_sensors_runtime[i].next_read_time == 0) {
 			uint16_t	temp = 0;
 			//time to deal with this temp sensor
 			switch(temp_sensors[i].temp_type) {
@@ -390,7 +387,7 @@ void temp_sensor_tick() {
 					else if (temp_sensors_runtime[i].target_temp < temp)
 						temp--;
 
-					temp_sensors_runtime[i].next_read_time = 0;
+					temp_sensors_runtime[i].next_read_time = 1;
 
 					break;
 				#endif	/* TEMP_DUMMY */
@@ -407,6 +404,11 @@ void temp_sensor_tick() {
 			  (EWMA_SCALE-EWMA_ALPHA) * temp_sensors_runtime[i].last_read_temp
 			                                         ) / EWMA_SCALE);
 		}
+
+		// decrement the counter here so that we avoid a off-by-one error
+		// it's assumed that sensor update code in the switch statement above
+		// has set a non-zero next_read_time (!)
+		temp_sensors_runtime[i].next_read_time--;
 	}
 
 	#ifdef HAVE_ANALOG_TICK
