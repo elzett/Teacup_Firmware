@@ -279,7 +279,7 @@ void temp_sensor_tick() {
 	temp_sensor_t i = 0;
 
 	for (; i < NUM_TEMP_SENSORS; i++) {
-		if (temp_sensors_runtime[i].next_read_time == 0) {
+    if (--temp_sensors_runtime[i].next_read_time == 0) {
 			uint16_t	temp = 0;
 			//time to deal with this temp sensor
 			switch(temp_sensors[i].temp_type) {
@@ -393,43 +393,14 @@ void temp_sensor_tick() {
 			                                         ) / EWMA_SCALE);
 		}
 
-		#ifdef HAVE_ANALOG_TICK
-			// sensors that use analog_read() need an analog_tick() a 10ms cycle
-			// before they actually do the reading so that ADC conversion can start
-			// and finish in time
-			if (temp_sensors_runtime[i].next_read_time == 1) {
-				uint8_t needs_analog_tick = 0;
-
-				// determine if the sensor uses analog_read()
-				switch(temp_sensors[i].temp_type) {
-					#ifdef	TEMP_THERMISTOR
-						case TT_THERMISTOR:
-							needs_analog_tick = 1;
-							break;
-					#endif	/* TEMP_THERMISTOR */
-
-					#ifdef	TEMP_AD595
-					case TT_AD595:
-						needs_analog_tick = 1;
-						break;
-					#endif	/* TEMP_AD595 */
-
-					default: /* prevent compiler warning */
-						break;
-				}
-
-				// if so, then it needs analog_tick()
-				if (needs_analog_tick) {
-					// start ADC conversion
-					analog_tick();
-				}
-			}
-		#endif /* HAVE_ANALOG_TICK */
-
-		// decrement the counter here so that we avoid a off-by-one error
-		// it's assumed that sensor update code in the switch statement above
-		// has set a non-zero next_read_time (!)
-		temp_sensors_runtime[i].next_read_time--;
+    #ifdef HAVE_ANALOG_TICK
+      // Start the ADC one tick (10ms) before it is needed, if it will be needed.
+      if (temp_sensors_runtime[i].next_read_time == 1) {
+        if (temp_sensors[i].temp_type == TT_THERMISTOR ||
+            temp_sensors[i].temp_type == TT_AD595)
+            analog_tick();
+      }
+    #endif /* HAVE_ANALOG_TICK */
 	}
 }
 
