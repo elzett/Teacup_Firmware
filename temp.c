@@ -126,6 +126,10 @@ void temp_init() {
 				// schedule first read
 				// need to decrement by 1, because clock_counter_250ms is 1 tick ahead
 				temp_sensors_runtime[i].next_read_time = ANALOG_READ_INTERVAL - 1;
+        #ifdef HAVE_ANALOG_TICK
+          if (ANALOG_READ_INTERVAL == 1)
+            analog_tick();
+        #endif
 				break;
 		#endif
 
@@ -135,6 +139,10 @@ void temp_init() {
 				// schedule first read
 				// need to decrement by 1, because clock_counter_250ms is 1 tick ahead
 				temp_sensors_runtime[i].next_read_time = ANALOG_READ_INTERVAL - 1;
+        #ifdef HAVE_ANALOG_TICK
+          if (ANALOG_READ_INTERVAL == 1)
+            analog_tick();
+        #endif
 				break;
 		#endif
 
