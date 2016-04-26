@@ -51,6 +51,10 @@
 #include	"analog.h"
 #endif
 
+#ifdef SIMULATOR
+  void analog_start() {}
+#endif
+
 typedef enum {
 	PRESENT,
 	TCOPEN
@@ -86,7 +90,7 @@ struct {
 
 	uint16_t					temp_residency; ///< how long have we been close to target temperature in temp ticks?
 
-	uint16_t					next_read_time; ///< how long until we can read this sensor again?
+	uint16_t					read_counter; ///< how long until we can read this sensor again?
 } temp_sensors_runtime[NUM_TEMP_SENSORS];
 
 /// Set up temp sensors.
@@ -257,15 +261,26 @@ static uint16_t temp_table_lookup(uint16_t temp, uint8_t sensor) {
 }
 #endif /* TEMP_THERMISTOR || TEMP_MCP3008 */
 
+/** We call this in the 250ms clock.
+  The 250ms clock is called after the 10ms clock/temp_sensor_tick()!
+*/
+void temp_sensor_start() {
+#if defined TEMP_THERMISTOR || defined  TEMP_AD595
+  analog_start();
+#endif
+  temp_sensor_t i = 0;
+
+  for (; i < NUM_TEMP_SENSORS; i++) {
+    temp_sensors_runtime[i].read_counter = 1; // TODO: add a unique counter for each sensor
+  }
+}
+
 /// called every 10ms from clock.c - check all temp sensors that are ready for checking
 void temp_sensor_tick() {
 	temp_sensor_t i = 0;
 
 	for (; i < NUM_TEMP_SENSORS; i++) {
-		if (temp_sensors_runtime[i].next_read_time) {
-			temp_sensors_runtime[i].next_read_time--;
-		}
-		else {
+		if (temp_sensors_runtime[i].read_counter) {
 			uint16_t	temp = 0;
 			//time to deal with this temp sensor
 			switch(temp_sensors[i].temp_type) {
@@ -298,7 +313,7 @@ void temp_sensor_tick() {
 					}
 
 					// this number depends on how frequently temp_sensor_tick is called. the MAX6675 can give a reading every 0.22s, so set this to about 250ms
-					temp_sensors_runtime[i].next_read_time = 25;
+					// temp_sensors_runtime[i].read_counter = 25;
 
 					break;
 				#endif	/* TEMP_MAX6675	*/
@@ -308,7 +323,7 @@ void temp_sensor_tick() {
             // Read current temperature.
             temp = temp_table_lookup(analog_read(i), i);
 
-            temp_sensors_runtime[i].next_read_time = 0;
+            // temp_sensors_runtime[i].read_counter = 0;
             break;
 				#endif	/* TEMP_THERMISTOR */
 
@@ -319,7 +334,7 @@ void temp_sensor_tick() {
 
             // This is an SPI read so it is not as fast as on-chip ADC. A read
             // every 100ms should be sufficient.
-            temp_sensors_runtime[i].next_read_time = 10;
+            // temp_sensors_runtime[i].read_counter = 10;
             break;
         #endif /* TEMP_MCP3008 */
 
@@ -331,7 +346,7 @@ void temp_sensor_tick() {
 					// >>8 instead of >>10 because internal temp is stored as 14.2 fixed point
 					temp = (temp * 500L) >> 8;
 
-					temp_sensors_runtime[i].next_read_time = 0;
+					// temp_sensors_runtime[i].read_counter = 0;
 
 					break;
 				#endif	/* TEMP_AD595 */
@@ -346,7 +361,7 @@ void temp_sensor_tick() {
 				case TT_INTERCOM:
 					temp = read_temperature(temp_sensors[i].temp_pin);
 
-					temp_sensors_runtime[i].next_read_time = 25;
+					// temp_sensors_runtime[i].read_counter = 25;
 
 					break;
 				#endif	/* TEMP_INTERCOM */
@@ -360,7 +375,7 @@ void temp_sensor_tick() {
 					else if (temp_sensors_runtime[i].target_temp < temp)
 						temp--;
 
-					temp_sensors_runtime[i].next_read_time = 0;
+					// temp_sensors_runtime[i].read_counter = 0;
 
 					break;
 				#endif	/* TEMP_DUMMY */
@@ -379,7 +394,14 @@ void temp_sensor_tick() {
 			temp_sensors_runtime[i].last_read_temp = (uint16_t) ((EWMA_ALPHA * temp +
 			  (EWMA_SCALE-EWMA_ALPHA) * temp_sensors_runtime[i].last_read_temp
 			                                         ) / EWMA_SCALE);
+      temp_sensors_runtime[i].read_counter--;
+      if (!temp_sensors_runtime[i].read_counter) {
+        if (temp_sensors[i].heater < NUM_HEATERS) {
+          heater_tick(temp_sensors[i].heater, temp_sensors[i].temp_type, temp_sensors_runtime[i].last_read_temp, temp_sensors_runtime[i].target_temp);
+        }
+      }
 		}
+    
 		if (labs((int16_t)(temp_sensors_runtime[i].last_read_temp - temp_sensors_runtime[i].target_temp)) < (TEMP_HYSTERESIS*4)) {
 			if (temp_sensors_runtime[i].temp_residency < (TEMP_RESIDENCY_TIME*120))
 				temp_sensors_runtime[i].temp_residency++;
@@ -391,10 +413,6 @@ void temp_sensor_tick() {
 				temp_sensors_runtime[i].temp_residency -= 10;
 			else
 				temp_sensors_runtime[i].temp_residency = 0;
-		}
-
-		if (temp_sensors[i].heater < NUM_HEATERS) {
-			heater_tick(temp_sensors[i].heater, temp_sensors[i].temp_type, temp_sensors_runtime[i].last_read_temp, temp_sensors_runtime[i].target_temp);
 		}
 
     if (DEBUG_PID && (debug_flags & DEBUG_PID))

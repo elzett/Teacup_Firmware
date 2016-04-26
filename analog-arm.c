@@ -85,4 +85,7 @@ uint16_t analog_read(uint8_t index) {
   return result;
 }
 
+// nothing todo for the LPC
+void analog_start() {}
+
 #endif /* defined TEACUP_C_INCLUDE && defined __ARMEL__ */

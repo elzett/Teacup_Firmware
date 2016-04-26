@@ -66,6 +66,7 @@ ISR(ADC_vect, ISR_NOBLOCK) {
 			adc_counter++;
 			if (adc_counter >= sizeof(adc_channel))
 				adc_counter = 0;
+        ADCSRA &= ~(MASK(ADIE));
 		} while (adc_channel[adc_counter] == 255);
 
 		// start next conversion
@@ -78,7 +79,9 @@ ISR(ADC_vect, ISR_NOBLOCK) {
 		#endif
 
 		// After the mux has been set, start a new conversion
-		ADCSRA |= MASK(ADSC);
+    if (adc_counter) {
+		  ADCSRA |= MASK(ADSC);
+    }
 	}
 }
 
@@ -104,6 +107,11 @@ uint16_t analog_read(uint8_t index) {
   }
 
   return result;
+}
+
+// This will starts the interrupt again
+void analog_start() {
+  ADCSRA |= MASK(ADIE) | MASK(ADSC);
 }
 
 #endif /* defined TEACUP_C_INCLUDE && defined __AVR__ */
