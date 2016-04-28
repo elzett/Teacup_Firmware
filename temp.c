@@ -82,7 +82,11 @@ static struct {
   uint8_t           active;          ///< State machine tracker for readers that need it
 } temp_sensors_runtime[NUM_TEMP_SENSORS];
 
-/// Exponentially Weighted Moving Average alpha constant - default value
+/* Exponentially Weighted Moving Average alpha constant for smoothing
+  noisy sensors. Instrument Engineer's Handbook, 4th ed, Vol 2 p126
+  says values of 0.05 to 0.1 for TEMP_EWMA are typical. 
+*/
+/// default value
 #ifndef TEMP_EWMA
 	#define TEMP_EWMA 1.0
 #endif
@@ -132,36 +136,6 @@ void temp_init() {
 		}
 	}
 }
-
-/**
-  Read a measurement from the MCP3008 analog-digital-converter (ADC).
-
-  \param channel The ADC channel to read.
-
-  \return The raw ADC reading.
-
-  Documentation for this ADC see
-
-    https://www.adafruit.com/datasheets/MCP3008.pdf.
-*/
-#ifdef TEMP_MCP3008
-static uint16_t mcp3008_read(uint8_t channel) {
-  uint8_t temp_h, temp_l;
-
-  spi_select_mcp3008();
-
-  // Start bit.
-  spi_rw(0x01);
-
-  // Send read address and get MSB, then LSB byte.
-  temp_h = spi_rw((0b1000 | channel) << 4) & 0b11;
-  temp_l = spi_rw(0);
-
-  spi_deselect_mcp3008();
-
-  return temp_h << 8 | temp_l;
-}
-#endif /* TEMP_MCP3008 */
 
 /**
   Look up a degree Celsius value from a raw ADC reading.
@@ -308,10 +282,39 @@ static inline uint16_t temp_read_thermistor(temp_sensor_t i) {
 #endif  /* TEMP_THERMISTOR */
 
 #ifdef TEMP_MCP3008
+/**
+  Read a measurement from the MCP3008 analog-digital-converter (ADC).
+
+  \param channel The ADC channel to read.
+
+  \return The raw ADC reading.
+
+  Documentation for this ADC see
+
+    https://www.adafruit.com/datasheets/MCP3008.pdf.
+*/
+static inline uint16_t temp_mcp3008_read(uint8_t channel) {
+  uint8_t temp_h, temp_l;
+
+  spi_select_mcp3008();
+
+  // Start bit.
+  spi_rw(0x01);
+
+  // Send read address and get MSB, then LSB byte.
+  temp_h = spi_rw((0b1000 | channel) << 4) & 0b11;
+  temp_l = spi_rw(0);
+
+  spi_deselect_mcp3008();
+
+  return temp_h << 8 | temp_l;
+}
 static inline uint16_t temp_read_mcp3008(temp_sensor_t i) {
   switch (temp_sensors_runtime[i].active++) {
     case 1:
-      return temp_table_lookup(mcp3008_read(temp_sensors[i].temp_pin), i);
+      return temp_table_lookup(temp_mcp3008_read(temp_sensors[i].temp_pin), i);
+    // This is an SPI read so it is not as fast as on-chip ADC. A read
+    // every 100ms should be sufficient.
     case 10:  // idle for 100ms
       temp_sensors_runtime[i].active = 0;
   }
