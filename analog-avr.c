@@ -51,7 +51,7 @@ void analog_init() {
   } /* analog_mask */
 }
 
-void analog_tick(void) {
+void start_adc(void) {
 		// Start a new conversion
 		ADCSRA |= MASK(ADSC);
 }

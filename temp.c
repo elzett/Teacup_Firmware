@@ -267,8 +267,8 @@ static inline uint16_t temp_read_max6675(temp_sensor_t i) {
 static inline uint16_t temp_read_thermistor(temp_sensor_t i) {
   switch (temp_sensors_runtime[i].active++) {
     case 1:  // Start ADC conversion
-      #ifdef HAVE_ANALOG_TICK
-        analog_tick();
+      #ifdef NEEDS_START_ADC
+        start_adc();
         return TEMP_NOT_READY;
       #endif
       // else fall through to conversion
@@ -326,8 +326,8 @@ static inline uint16_t temp_read_mcp3008(temp_sensor_t i) {
 static inline uint16_t temp_read_ad595(temp_sensor_t i) {
   switch (temp_sensors_runtime[i].active++) {
     case 1:  // Start ADC conversion
-      #ifdef HAVE_ANALOG_TICK
-        analog_tick();
+      #ifdef NEEDS_START_ADC
+        start_adc();
         return TEMP_NOT_READY;
       #endif
       // else fall through to conversion
