@@ -265,17 +265,22 @@ static inline uint16_t temp_read_max6675(temp_sensor_t i) {
 
 #ifdef TEMP_THERMISTOR
 static inline uint16_t temp_read_thermistor(temp_sensor_t i) {
+  uint16_t result;
   switch (temp_sensors_runtime[i].active++) {
     case 1:  // Start ADC conversion
       #ifdef NEEDS_START_ADC
         start_adc();
         return TEMP_NOT_READY;
       #endif
-      // else fall through to conversion
+      // if not in continuous mode or no need for start_adc
+      // fall through to conversion
 
     case 2:  // Convert temperature values
+      #ifndef TEMP_READ_CONTINUOUS
+        result = analog_read(i);
+      #endif
       temp_sensors_runtime[i].active = 0;
-      return temp_table_lookup(analog_read(i), i);
+      return temp_table_lookup(result, i);
   }
   return TEMP_NOT_READY;
 }
@@ -324,18 +329,23 @@ static inline uint16_t temp_read_mcp3008(temp_sensor_t i) {
 
 #ifdef TEMP_AD595
 static inline uint16_t temp_read_ad595(temp_sensor_t i) {
+  uint16_t result;
   switch (temp_sensors_runtime[i].active++) {
     case 1:  // Start ADC conversion
       #ifdef NEEDS_START_ADC
         start_adc();
         return TEMP_NOT_READY;
       #endif
-      // else fall through to conversion
+      // if not in continuous mode or no need for start_adc
+      // fall through to conversion
 
     case 2:  // Convert temperature values
+      #ifndef TEMP_READ_CONTINUOUS
+        result = analog_read(i);
+      #endif
       temp_sensors_runtime[i].active = 0;
       // convert: >>8 instead of >>10 because internal temp is stored as 14.2 fixed point
-      return (analog_read(i) * 500L ) >> 8;
+      return (result * 500L ) >> 8;
   }
   return TEMP_NOT_READY;
 }
