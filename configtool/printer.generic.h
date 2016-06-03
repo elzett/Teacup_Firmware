@@ -22,7 +22,7 @@
     moving on the X-Y-plane.
 */
 #define KINEMATICS_STRAIGHT
-#define KINEMATICS_COREXY
+//#define KINEMATICS_COREXY
 
 /** \def STEPS_PER_M_X STEPS_PER_M_Y STEPS_PER_M_Z STEPS_PER_M_E
   Steps per meter ( = steps per mm * 1000 ), calculate these values
@@ -92,14 +92,14 @@
     Sane values: according to printer build room size
     Valid range: -1000.0 to 1000.0
 */
-#define X_MIN                    0.0
-#define X_MAX                    200.0
+//#define X_MIN                    0.0
+//#define X_MAX                    200.0
 
-#define Y_MIN                    0.0
-#define Y_MAX                    200.0
+//#define Y_MIN                    0.0
+//#define Y_MAX                    200.0
 
-#define Z_MIN                    0.0
-#define Z_MAX                    140.0
+//#define Z_MIN                    0.0
+//#define Z_MAX                    140.0
 
 /** \def E_ABSOLUTE
   Some G-code creators produce relative length commands for the extruder,
@@ -116,9 +116,9 @@
   ACCELERATION_TEMPORAL. With none of them defined, movements are done
   without acceleration. Recommended is ACCELERATION_RAMPING.
 */
-#define ACCELERATION_REPRAP
+//#define ACCELERATION_REPRAP
 #define ACCELERATION_RAMPING
-#define ACCELERATION_TEMPORAL
+//#define ACCELERATION_TEMPORAL
 
 /** \def ACCELERATION
   How fast to accelerate when using ACCELERATION_RAMPING. Start with 10 for
@@ -187,7 +187,7 @@
 
   This option has no effect on controllers with a common stepper enable pin.
 */
-#define Z_AUTODISABLE
+//#define Z_AUTODISABLE
 
 /** \def TEMP_HYSTERESIS
   Actual temperature must be target +/- this hysteresis before target
@@ -242,23 +242,23 @@
   bytes smaller, so you might want to disable EEPROM storage on small MCUs,
   like the ATmega168.
 */
-#define EECONFIG
+//#define EECONFIG
 
 /** \def BANG_BANG
   Drops PID loop from heater control, reduces code size significantly
   (1300 bytes!).
 */
-#define BANG_BANG
+//#define BANG_BANG
 
 /** \def BANG_BANG_ON
   PWM value for Bang Bang 'on'.
 */
-#define BANG_BANG_ON             200
+//#define BANG_BANG_ON             200
 
 /** \def BANG_BANG_OFF
   PWM value for Bang Bang 'off'.
 */
-#define BANG_BANG_OFF            45
+//#define BANG_BANG_OFF            45
 
 /** \def MOVEBUFFER_SIZE
   Move buffer size, in number of moves.
@@ -276,8 +276,8 @@
   this value as the index or name. You probably also want to comment out
   E_STEP_PIN and E_DIR_PIN in the Pinouts section above.
 */
-#define DC_EXTRUDER              HEATER_motor
-#define DC_EXTRUDER_PWM          180
+//#define DC_EXTRUDER              HEATER_motor
+//#define DC_EXTRUDER_PWM          180
 
 /** \def USE_WATCHDOG
   Teacup implements a watchdog, which has to be reset every 250ms or it will
@@ -286,7 +286,7 @@
   is probably even worse than just hanging, and there is no better restore
   code in place, this is disabled for now.
 */
-#define USE_WATCHDOG
+//#define USE_WATCHDOG
 
 /** \def TH_COUNT
   Temperature history count. This is how many temperature readings to keep in

@@ -51,41 +51,41 @@
 #define X_MIN_PIN                DIO3
 #define X_MAX_PIN                DIO2
 #define X_ENABLE_PIN             DIO38
-#define X_INVERT_DIR
-#define X_INVERT_MIN
-#define X_INVERT_MAX
-#define X_INVERT_ENABLE
+//#define X_INVERT_DIR
+//#define X_INVERT_MIN
+//#define X_INVERT_MAX
+//#define X_INVERT_ENABLE
 
 #define Y_STEP_PIN               DIO60
 #define Y_DIR_PIN                DIO61
 #define Y_MIN_PIN                DIO14
 #define Y_MAX_PIN                DIO15
 #define Y_ENABLE_PIN             DIO56
-#define Y_INVERT_DIR
-#define Y_INVERT_MIN
-#define Y_INVERT_MAX
-#define Y_INVERT_ENABLE
+//#define Y_INVERT_DIR
+//#define Y_INVERT_MIN
+//#define Y_INVERT_MAX
+//#define Y_INVERT_ENABLE
 
 #define Z_STEP_PIN               DIO46
 #define Z_DIR_PIN                DIO48
 #define Z_MIN_PIN                DIO18
 #define Z_MAX_PIN                DIO19
 #define Z_ENABLE_PIN             DIO62
-#define Z_INVERT_DIR
-#define Z_INVERT_MIN
-#define Z_INVERT_MAX
-#define Z_INVERT_ENABLE
+//#define Z_INVERT_DIR
+//#define Z_INVERT_MIN
+//#define Z_INVERT_MAX
+//#define Z_INVERT_ENABLE
 
 #define E_STEP_PIN               DIO26
 #define E_DIR_PIN                DIO28
 #define E_ENABLE_PIN             DIO24
-#define E_INVERT_DIR
-#define E_INVERT_ENABLE
+//#define E_INVERT_DIR
+//#define E_INVERT_ENABLE
 
 #define PS_ON_PIN                xxxx
 #define PS_MOSFET_PIN            xxxx
 #define STEPPER_ENABLE_PIN       xxxx
-#define STEPPER_INVERT_ENABLE
+//#define STEPPER_INVERT_ENABLE
 
 /** \def DEBUG_LED_PIN
 
@@ -97,7 +97,7 @@
   a LED in hardware), see
   http://reprap.org/wiki/Teacup_Firmware#Doing_precision_profiling
 */
-#define DEBUG_LED_PIN            DIO13
+//#define DEBUG_LED_PIN            DIO13
 
 /** \def SD_CARD_SELECT_PIN
 
@@ -111,7 +111,7 @@
   Connecting a device to SPI actually uses 4 signal lines, the other three
   pins are choosen by Teacup automatically.
 */
-#define SD_CARD_SELECT_PIN       DIO53
+//#define SD_CARD_SELECT_PIN       DIO53
 
 /** \def MCP3008_SELECT_PIN
 
@@ -122,7 +122,7 @@
   pin is required only if at least one temperature sensor of type MCP3008 is
   configured. Else it's ignored.
 */
-#define MCP3008_SELECT_PIN       xxxx
+//#define MCP3008_SELECT_PIN       xxxx
 
 
 /***************************************************************************\
@@ -142,12 +142,12 @@
   uncommented, comment out all others to save binary size and enhance
   performance.
 */
-#define TEMP_MAX6675
+//#define TEMP_MAX6675
 #define TEMP_THERMISTOR
-#define TEMP_AD595
-#define TEMP_PT100
-#define TEMP_INTERCOM
-#define TEMP_MCP3008
+//#define TEMP_AD595
+//#define TEMP_PT100
+//#define TEMP_INTERCOM
+//#define TEMP_MCP3008
 
 /** \def TEMP_SENSOR_PIN
   Temperature sensor pins a user should be able to choose from in configtool.
@@ -256,13 +256,13 @@
   sending G-code files with a plain terminal emulator, like GtkTerm (Linux),
   CoolTerm (Mac) or HyperTerminal (Windows).
 */
-#define XONXOFF
+//#define XONXOFF
 
 /** \def USB_SERIAL
   Define this for using USB instead of the serial RS232 protocol. Works on
   USB-equipped ATmegas, like the ATmega32U4, only.
 */
-#define USB_SERIAL
+//#define USB_SERIAL
 
 
 /***************************************************************************\
@@ -279,10 +279,10 @@
   Comment in the one in use, comment out all others. If there is no display,
   comment out all of them to remove display code for better performance.
 */
-#define DISPLAY_BUS_4BIT
-#define DISPLAY_BUS_8BIT
-#define DISPLAY_BUS_I2C
-#define DISPLAY_BUS_SPI
+//#define DISPLAY_BUS_4BIT
+//#define DISPLAY_BUS_8BIT
+//#define DISPLAY_BUS_I2C
+//#define DISPLAY_BUS_SPI
 
 /** \def DISPLAY_RS_PIN DISPLAY_RW_PIN DISPLAY_E_PIN
     \def DISPLAY_D4_PIN DISPLAY_D5_PIN DISPLAY_D6_PIN DISPLAY_D7_PIN
@@ -306,5 +306,5 @@
   Comment in the display in use, comment out all others. If there is no
   display, comment out all of DISPLAY_BUS_xxx.
 */
-#define DISPLAY_TYPE_SSD1306
-#define DISPLAY_TYPE_HD44780
+//#define DISPLAY_TYPE_SSD1306
+//#define DISPLAY_TYPE_HD44780
